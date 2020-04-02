@@ -17,9 +17,10 @@ let ToVarInt = (value) => {
     return Buffer.from(bytes);
 }
 
-exports.mc = {
+exports.minecraft = {
     help: 'Tells how many player are on the minecraft server',
-    usage: '!mc',
+    usage: '!minecraft',
+    aliases: [ 'mc' ],
     /**
      * Flips a coin for the user
      * @param {string[]} args - Command arguments
