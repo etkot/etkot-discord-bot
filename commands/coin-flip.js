@@ -4,6 +4,7 @@ let coinFlips = {};
 
 exports.flip = {
     help: 'Flips a coin for you',
+    usage: '!flip <heads/tails>',
     /**
      * Flips a coin for the user
      * @param {string[]} args - Command arguments
@@ -26,7 +27,7 @@ exports.flip = {
         if (args[0] === 't' || args[0] === '1') args[0] = 'tails';
 
         if (args[0] === undefined || (args[0] !== 'heads' && args[0] !== 'tails')) {
-            msg.channel.send(`You have to also guess **heads** or **tails**\n!flip [heads/tails]`)
+            msg.channel.send(`You have to also guess **heads** or **tails**\n!flip <heads/tails>`)
                 .catch(console.error);
             
             return;

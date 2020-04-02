@@ -19,6 +19,7 @@ let ToVarInt = (value) => {
 
 exports.mc = {
     help: 'Tells how many player are on the minecraft server',
+    usage: '!mc',
     /**
      * Flips a coin for the user
      * @param {string[]} args - Command arguments
