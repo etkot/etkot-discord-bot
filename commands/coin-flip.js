@@ -5,6 +5,7 @@ let coinFlips = {};
 exports.flip = {
     help: 'Flips a coin for you',
     usage: '!flip <heads/tails>',
+    aliases: ['f', '(╯°□°）╯︵ ┻━┻'],
     /**
      * Flips a coin for the user
      * @param {string[]} args - Command arguments
