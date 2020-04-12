@@ -1,5 +1,3 @@
-const { telegram } = require('../index');
-
 exports.help = {
     usage: '!help [command]',
     aliases: [ 'h' ],

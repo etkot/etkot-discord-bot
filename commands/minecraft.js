@@ -27,50 +27,66 @@ exports.minecraft = {
      * @param {Discord.Message} msg - User's message
      */
     func: (args, msg) => {
-        let host = process.env.MC_ADDR;
-        let port = Number(process.env.MC_PORT);
+        let hosts = process.env.MC_ADDR.split(',');
+        let ports = process.env.MC_PORT.split(',');
 
-        let client = net.connect({ host, port }, () => {
-            let bufPacketId = ToVarInt(0);
-            let bufVersion = ToVarInt(-1);
-            let bufAddressLen = ToVarInt(host.length);
-            let bufAddress = Buffer.from(host);
-            let bufPort = Buffer.from([ port >> 8, port ]);
-            let bufMode = ToVarInt(1);
+        let ready = 0;
+        let texts = [];
+        const sendResponse = (text, index) => {
+            texts[index] = text;
 
-            let bufLength = ToVarInt(
-                bufPacketId.length +
-                bufVersion.length +
-                bufAddressLen.length +
-                bufAddress.length +
-                bufPort.length +
-                bufMode.length
-            );
-
-            let buf = Buffer.concat([ bufLength, bufPacketId, bufVersion, bufAddressLen, bufAddress, bufPort, bufMode ]);
-            
-            client.write(buf);
-            client.write(Buffer.concat([ ToVarInt(1), ToVarInt(0) ]));
-        });
-
-        client.on('data', (data) => {
-            data = data.toString();
-            while (data[0] !== '{') {
-                data = data.substr(1);
+            if (++ready == hosts.length) {
+                msg.channel.send(texts.join('\n\n'))
+                    .catch(console.error);
             }
+        }
 
-            data = JSON.parse(data);
+        for (let i in hosts)
+        {
+            let host = hosts[i];
+            let port = ports[i];
 
-            let text = `**${data.description.text}** (${data.players.online}/${data.players.max})`;
+            let client = net.connect({ host, port }, () => {
+                let bufPacketId = ToVarInt(0);
+                let bufVersion = ToVarInt(-1);
+                let bufAddressLen = ToVarInt(host.length);
+                let bufAddress = Buffer.from(host);
+                let bufPort = Buffer.from([ port >> 8, port ]);
+                let bufMode = ToVarInt(1);
 
-            for (let p in data.players.sample) {
-                text += `\n    ${data.players.sample[p].name}`
-            }
+                let bufLength = ToVarInt(
+                    bufPacketId.length +
+                    bufVersion.length +
+                    bufAddressLen.length +
+                    bufAddress.length +
+                    bufPort.length +
+                    bufMode.length
+                );
 
-            msg.channel.send(text)
-                .catch(console.error);
-            
-            client.end();
-        });
+                let buf = Buffer.concat([ bufLength, bufPacketId, bufVersion, bufAddressLen, bufAddress, bufPort, bufMode ]);
+                
+                client.write(buf);
+                client.write(Buffer.concat([ ToVarInt(1), ToVarInt(0) ]));
+            });
+
+            client.on('data', (data) => {
+                data = data.toString();
+                while (data[0] !== '{') {
+                    data = data.substr(1);
+                }
+
+                data = JSON.parse(data);
+
+                let text = `**${data.description.text}** (${data.players.online}/${data.players.max})`;
+
+                for (let p in data.players.sample) {
+                    text += `\n    ${data.players.sample[p].name}`
+                }
+
+                sendResponse(text, i);
+                
+                client.end();
+            });
+        }
     }
 }
