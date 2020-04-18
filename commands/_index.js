@@ -5,7 +5,7 @@ let commands = {};
 // Load commands
 let files = fs.readdirSync('./commands');
 for (let file of files) {
-    if (file !== 'index.js') {
+    if (file[0] !== '_') {
         let moduleCommands = require(`./${file}`);
 
         for (let c in moduleCommands) {
