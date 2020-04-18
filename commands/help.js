@@ -2,7 +2,7 @@ exports.help = {
     usage: '!help [command]',
     aliases: [ 'h' ],
     func: (args, msg) => {
-        const commands = require('./index');
+        const commands = require('./_index');
         let text = '';
 
         if (args.length > 0) {
