@@ -59,12 +59,12 @@ exports.stop = () => {
     if (voiceConnection) {
         if (voiceConnection.dispatcher)
             voiceConnection.dispatcher.emit('finish');
-        
+
+        voiceConnection.client.user.setPresence({ status: 'online' })
+            .catch(console.error);
+            
         voiceConnection.disconnect();
         voiceConnection = undefined;
-
-        msg.client.user.setPresence({ status: 'online' })
-            .catch(console.error);
 
         return true;
     }
