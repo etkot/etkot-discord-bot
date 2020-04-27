@@ -14,7 +14,7 @@ client.on('message', msg => {
         let args = msg.content.substr(1).split(' ');
         let cmd = args.shift();
 
-        if (commands[cmd]) {
+        if (commands[cmd.toLowerCase()]) {
             commands[cmd].func(args, msg);
         }
     }
