@@ -1,4 +1,5 @@
 require('dotenv').config();
+require('./mongoUtil').connectToServer(process.env.DB_NAME);
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
