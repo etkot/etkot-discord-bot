@@ -1,7 +1,6 @@
-const Discord = require('discord.js');
+const Discord = require('discord.js')
 
-let voiceConnection = undefined;
-
+let voiceConnection = undefined
 
 // Helper functions
 
@@ -11,68 +10,59 @@ let voiceConnection = undefined;
  * @returns {Promise<Discord.StreamDispatcher>}
  */
 exports.start = (channel, stream, streamOptions) => {
-    streamOptions = streamOptions || { seek: 0, volume: 0.3 };
+    streamOptions = streamOptions || { seek: 0, volume: 0.3 }
 
     return new Promise((resolve, reject) => {
         if (!channel) {
             // No channel
-            reject("You're not connected to a voice channel");
-        }
-        else if (voiceConnection && channel == voiceConnection.channel) {
+            reject("You're not connected to a voice channel")
+        } else if (voiceConnection && channel == voiceConnection.channel) {
             // Same channel
 
             if (stream) {
-                if (voiceConnection.dispatcher)
-                    voiceConnection.dispatcher.emit('finish');
+                if (voiceConnection.dispatcher) voiceConnection.dispatcher.emit('finish')
 
-                resolve(voiceConnection.play(stream, streamOptions));
+                resolve(voiceConnection.play(stream, streamOptions))
+            } else {
+                resolve(undefined)
             }
-            else {
-                resolve(undefined);
-            }
-        }
-        else if (voiceConnection) {
+        } else if (voiceConnection) {
             // Different channel
-            reject("You have to be in the same voice channel");
-        }
-        else {
+            reject('You have to be in the same voice channel')
+        } else {
             // No connection
-            channel.join()
-                .then(connection => {
-                    voiceConnection = connection;
+            channel
+                .join()
+                .then((connection) => {
+                    voiceConnection = connection
 
                     if (stream) {
-                        resolve(voiceConnection.play(stream, streamOptions));
-                    }
-                    else {
-                        resolve(undefined);
+                        resolve(voiceConnection.play(stream, streamOptions))
+                    } else {
+                        resolve(undefined)
                     }
                 })
-                .catch(err => {
-                    reject('Could not connect to your voice channel');
-                });
+                .catch((err) => {
+                    reject('Could not connect to your voice channel')
+                })
         }
-    });
+    })
 }
 
 exports.stop = () => {
     if (voiceConnection) {
-        if (voiceConnection.dispatcher)
-            voiceConnection.dispatcher.emit('finish');
+        if (voiceConnection.dispatcher) voiceConnection.dispatcher.emit('finish')
 
-        voiceConnection.client.user.setPresence({ status: 'online' })
-            .catch(console.error);
-            
-        voiceConnection.disconnect();
-        voiceConnection = undefined;
+        voiceConnection.client.user.setPresence({ status: 'online' }).catch(console.error)
 
-        return true;
+        voiceConnection.disconnect()
+        voiceConnection = undefined
+
+        return true
     }
 
-    return false;
+    return false
 }
-
-
 
 // Commands
 
@@ -86,9 +76,8 @@ exports.join = {
      * @param {Discord.Message} msg - User's message
      */
     func: (args, msg) => {
-        exports.start(msg.member.voice.channel)
-            .catch(msg.reply);
-    }
+        exports.start(msg.member.voice.channel).catch(msg.reply)
+    },
 }
 
 exports.leave = {
@@ -101,7 +90,6 @@ exports.leave = {
      * @param {Discord.Message} msg - User's message
      */
     func: (args, msg) => {
-        if (!exports.stop())
-            msg.reply("I'm already disconnected");
-    }
+        if (!exports.stop()) msg.reply("I'm already disconnected")
+    },
 }
