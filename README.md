@@ -17,6 +17,9 @@ Before starting you will need to create a file called `.env` with the following 
 # Discord
 DC_TOKEN=[Your Discord bot token]
 
+# MongoDB
+DB_NAME=[Name of your MongoDB database]
+
 # Minecraft Server
 MC_ADDR=[Minecraft server address]
 MC_PORT=[Minecraft server port]

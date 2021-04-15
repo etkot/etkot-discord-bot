@@ -1,4 +1,13 @@
 const Discord = require('discord.js')
+const mongoUtil = require('../mongoUtil')
+
+let collection = undefined
+let GetCollection = () => {
+    if (!collection) {
+        collection = mongoUtil.getDb().collection('flipstats')
+    }
+    return collection
+}
 
 let coinFlips = {}
 
@@ -57,8 +66,74 @@ exports.flip = {
                     )
 
                     coinFlips[msg.author].result = rnd
+
+                    GetCollection().findOne({ id: msg.author.id }, (err, result) => {
+                        if (result === null) {
+                            GetCollection().insertOne({
+                                id: msg.author.id,
+                                total: 1,
+                                wins: rnd === guess ? 1 : 0,
+                                heads: guess === 0 ? 1 : 0,
+                                tails: guess === 1 ? 1 : 0,
+                            })
+                        } else {
+                            GetCollection().updateOne(
+                                { id: msg.author.id },
+                                {
+                                    $inc: {
+                                        total: 1,
+                                        wins: rnd === guess ? 1 : 0,
+                                        heads: guess === 0 ? 1 : 0,
+                                        tails: guess === 1 ? 1 : 0,
+                                    },
+                                }
+                            )
+                        }
+                    })
                 }, 1000)
             })
             .catch(console.error)
+    },
+}
+
+exports.flipstats = {
+    help: 'Gives flips stats',
+    usage: '!flipstats [username]',
+    aliases: ['fs', 'fstats', 'fstatz'],
+    /**
+     * Flips a coin for the user
+     * @param {string[]} args - Command arguments
+     * @param {Discord.Message} msg - User's message
+     */
+    func: (args, msg) => {
+        let query = {}
+        if (args.length > 0) {
+            const id = args[0].match(/([0-9]{18})/g)
+            if (id) {
+                query.id = id[0]
+            }
+        }
+
+        GetCollection()
+            .find(query)
+            .toArray(async (err, result) => {
+                result.sort((a, b) => b.wins - a.wins)
+
+                let str = '**Flip stats:**\n'
+                for (let i = 0; i < result.length; i++) {
+                    const user = result[i]
+                    str += `\t${i + 1}. ${msg.guild.member(user.id).displayName}: ${user.total} flips, ${Math.round(
+                        (user.wins / user.total) * 100
+                    )}%, ${
+                        user.tails < user.heads
+                            ? 'mains heads'
+                            : user.heads < user.tails
+                            ? 'mains tails'
+                            : 'indecisive cunt'
+                    }\n`
+                }
+
+                msg.channel.send(str)
+            })
     },
 }
