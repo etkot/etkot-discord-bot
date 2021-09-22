@@ -3,7 +3,7 @@ const fs = require('fs')
 let commands = {}
 
 // Load commands
-let files = fs.readdirSync('./commands')
+let files = fs.readdirSync(__dirname)
 for (let file of files) {
     if (file[0] !== '_') {
         let moduleCommands = require(`./${file}`)

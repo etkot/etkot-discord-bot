@@ -98,6 +98,7 @@ const SendQueue = (channel) => {
 }
 
 const GetLink = (search) => {
+    console.log(search, ytdl.validateURL(search))
     if (ytdl.validateURL(search)) {
         return search
     }
