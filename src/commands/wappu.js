@@ -20,7 +20,7 @@ exports.wappu = {
 
         Voice.start(msg.member.voice.channel, stream)
             .then((dispatcher) => {
-                https.get('https://stream.wappuradio.fi/wappuradio.opus', (res) => {
+                https.get('https://stream.wappuradio.fi/icecast/wappuradio-legacy-streamer1.opus', (res) => {
                     if (res.headers['content-type'] === 'application/ogg') {
                         const socket = io('https://wappuradio.fi/')
                         socket.on('np', (song) => {
